@@ -1,13 +1,21 @@
 #ifndef THREADS_H_
 #define THREADS_H_
 
-// TODO: necessary includes, if any
+#include <stdio.h>
+#include <stdlib.h>
 
-// TODO: necessary defines, if any
+#define STACK_SIZE 8192
 
-// TODO: definition of struct thread
+struct thread
+{
+    void (*fun) (void *);
+    void *arg;
+    void *stack_reg;
+    void *base_reg;
+    struct thread *next_thread;
+};
 
-struct thread *thread_create(void (*f)(void *), void *arg);
+struct thread *thread_create(void (*fun)(void *), void *arg);
 void thread_add_runqueue(struct thread *t);
 void thread_yield(void);
 void dispatch(void);

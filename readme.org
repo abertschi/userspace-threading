@@ -1,2 +1,2 @@
-* Manage threads in userland
+* Manage thread_list in userland
 
