@@ -3,16 +3,25 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include<setjmp.h>
 
-#define STACK_SIZE 8192
+#define STACK_SIZE 65536
+
+extern struct thread *current_thread;
+extern struct thread *prev_thread;
+
 
 struct thread
 {
+    int id;
     void (*fun) (void *);
     void *arg;
+    bool init_run;
     void *stack_reg;
     void *base_reg;
     struct thread *next_thread;
+    jmp_buf jmp_buf;
 };
 
 struct thread *thread_create(void (*fun)(void *), void *arg);
