@@ -7,7 +7,6 @@
         fprintf(stderr, "Fatal: failed to allocate memory\n"); \
         abort();}}\
 
-
 struct thread *current_thread = NULL;
 struct thread *prev_thread = NULL;
 int new_thread_id = 0;
@@ -16,7 +15,6 @@ jmp_buf main_thread;
 struct thread *
 thread_create(void (*fun)(void *), void *arg) {
     LL_LOG("creating a new thread...");
-
     struct thread *new_th = (struct thread *) malloc(sizeof(struct thread));
     FAIL_IF_NULL(new_th);
     new_th->id = new_thread_id++;
@@ -39,7 +37,6 @@ thread_create(void (*fun)(void *), void *arg) {
 void
 thread_add_runqueue(struct thread *t) {
     LL_LOG("adding thread %d to run queue...", t->id);
-
     if (!current_thread) {
         current_thread = t;
         t->next_thread = t;
@@ -54,24 +51,16 @@ thread_add_runqueue(struct thread *t) {
 void
 thread_yield(void) {
     LL_LOG("yielding a thread...");
-
     if (setjmp(current_thread->jmp_buf)) {
         return;
     } else {
-        // question:
-        // here we still have stack and base pointer of the current thread
-        // so how do we know where our stack base is to find current_thread?
-        // answer: These are global variables, no stack needed for reference
         longjmp(main_thread, 1);
-//        schedule();
-//        dispatch();
     }
 }
 
 void
 dispatch(void) {
     LL_LOG("dispatching a thread...");
-
     if (current_thread->init_run) {
         current_thread->init_run = false;
         LL_LOG("initial dispatch of thread %d", current_thread->id);
@@ -86,7 +75,6 @@ dispatch(void) {
         current_thread->fun(current_thread->arg);
         thread_exit();
         longjmp(main_thread, 1);
-
     } else {
         LL_LOG("thread %d previously run, continuing execution.", current_thread->id);
         longjmp(current_thread->jmp_buf, 1);
@@ -106,7 +94,6 @@ schedule(void) {
 void
 thread_exit(void) {
     if (current_thread == current_thread->next_thread) {
-        // no more threads left to run
         free(current_thread->base_reg);
         free(current_thread);
         current_thread = NULL;
@@ -126,7 +113,6 @@ thread_start_threading(void) {
         fprintf(stderr, "No threads scheduled to run\n");
         return;
     }
-
     while (current_thread) {
         if (!setjmp(main_thread)) {
             schedule();
