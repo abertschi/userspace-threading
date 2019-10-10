@@ -75,6 +75,8 @@ into our scheduler to schedule and dispatch another thread.
   selfish.
 
 ** Improvements
+- Stack size fixed and may not be enough. Scheduler does not catch
+  =SIGSEGV= when user space thread runs out of stack space.
 - Implement preemptive multitasking in user pace with signal
   handlers. Use =SIGALARM= and make kernel call into user space
   periodically. Use Linux APIs =makecontext()= / =swapcontext()= to switch
