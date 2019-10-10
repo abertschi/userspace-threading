@@ -16,9 +16,11 @@ void thread_yield(void);
 void thread_start_threading(void);
 #+END_SRC
 
-A user space thread is created with =thread_create(...)=. It is given a function to execute and
-function arguments. A thread can be added to the run queue with =thread_add_runqueue()=. A round-robin
-scheduling is implemented. Threading can be started with
+A user space thread is created with =thread_create(...)=. 
+It is given a function to execute and function arguments. 
+A thread can be added to the run queue with
+=thread_add_runqueue(...)=.
+A round-robin scheduling is implemented. Threading can be started with
 =thread_start_threading()=. This function returns if all user
 space threads returned. =thread_yield()= interrupts
 execution of a thread and runs the scheduler to dispatch the next thread. User
@@ -55,12 +57,13 @@ if (does thread run for first time ) {
      - emit mov <thread-specific-stack>, %%rsp;
      - call main function of thread
      - we reach here only when main function of thread terminates.
+     - longjmp to scheduler
 } else {
      - longjmp back to where execution last yielded
 }
 #+END_SRC
 
-** Yielding execution
+** Yield execution
 Threads need to cooperate and yield their execution to let other
 threads execute. Upon yield we are still on the stack of the
 thread. We need to store its execution environment and longjmp back
