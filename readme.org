@@ -1,6 +1,90 @@
-* Manage thread_list in userland
+* User space threading library
 
+This is a micro project of a x86-64 cooperative user space
+threading library written in C.
 
-* Reading
-- https://stackoverflow.com/questions/6768426/in-a-signal-handler-how-to-know-where-the-program-is-interrupted
-- 
+** API
+User space threads are mapped N:1, i.e. M user space threads are mapped
+to a single kernel space process. The implementation uses x86-64
+inline assembly and relies on setjump. It is only tested under
+GNU/Linux.
+
+#+BEGIN_SRC c
+struct thread *thread_create(void (*fun)(void *), void *arg);
+void thread_add_runqueue(struct thread *t);
+void thread_yield(void);
+void thread_start_threading(void);
+#+END_SRC
+
+A user space thread is created with =thread_create(...)=. It is given a function to execute and
+function arguments. A thread can be added to the run queue with =thread_add_runqueue()=. A round-robin
+scheduling is implemented. Threading can be started with
+=thread_start_threading()=. This function returns if all user
+space threads returned. =thread_yield()= interrupts
+execution of a thread and runs the scheduler to dispatch the next thread. User
+land threads are supposed to cooperate and explicitly yield when they
+no longer require CPU time and are not interrupted by other
+mechanisms.
+
+** Thread descriptor
+Upon creation, a thread is assigned a new stack region. Among other
+things, a thread descriptor keeps track of life-cycle state of a
+thread, and when yielded stores CPU context in a jmp_buf.
+
+#+BEGIN_SRC c
+struct thread {
+    int64_t id;
+    int8_t state;
+    void (*fun) (void *);
+    void *arg;
+    void *sp_base;
+    int32_t s_size;
+    jmp_buf jmp_buf;
+    struct thread *next;
+};
+#+END_SRC
+
+** Dispatching a thread
+When a thread is dispatched for the first time, it's stack and base
+registers are set. When the thread ran previously, it's execution
+context is restored with longjmp.
+
+#+BEGIN_SRC
+if (does thread run for first time ) {
+     - emit mov <thread-specific-stack>, %%rbp;
+     - emit mov <thread-specific-stack>, %%rsp;
+     - call main function of thread
+     - we reach here only when main function of thread terminates.
+} else {
+     - longjmp back to where execution last yielded
+}
+#+END_SRC
+
+** Yielding execution
+Threads need to cooperate and yield their execution to let other
+threads execute. Upon yield we are still on the stack of the
+thread. We need to store its execution environment and longjmp back
+into our scheduler to schedule and dispatch the next thread.
+
+#+BEGIN_SRC
+void thread_yield(void):
+   if (setjmp(jmp_buf of current thread))
+       return;
+    else 
+        longjmp(jmp_buf of scheduler);
+#+END_SRC
+
+** Limitations
+- This implementation uses inline assembly and is not portable.
+- The nature of cooperative multitasking allows threads to be
+  selfish.
+
+** Improvements
+- Implement preemptive multitasking in user pace with signal
+  handlers. Use =SIGALARM= and make kernel call into user space
+  periodically. Use Linux APIs =makecontext()= / =swapcontext()= to switch
+  execution environments.
+
+** Resources
+- [[[[http://www.gnu.org/software/pth/rse-pmt.ps]]][Portable-Multithreading - The Signal Stack Trick For User-Space Thread Creation]]
+- https://stackoverflow.com/questions/20448817/how-is-preemptive-scheduling-implemented-for-user-level-threads-in-linux
