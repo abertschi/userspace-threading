@@ -1,6 +1,6 @@
 * User space threading library
 
-This is a micro project of a x86-64 cooperative user space
+This is a micro project of a x86-64 asm, longjmp based, cooperative user space
 threading library written in C.
 
 ** API
@@ -23,7 +23,7 @@ A thread can be added to the run queue with
 A round-robin scheduling is implemented. Threading can be started with
 =thread_start_threading()=. This function returns if all user
 space threads returned. =thread_yield()= interrupts
-execution of a thread and runs the scheduler to dispatch the next thread. User
+execution of a thread and runs the scheduler to dispatch another thread. User
 land threads are supposed to cooperate and explicitly yield when they
 no longer require CPU time. They are not interrupted by other
 mechanisms.
@@ -67,7 +67,7 @@ if (does thread run for first time ) {
 Threads need to cooperate and yield their execution to let other
 threads execute. Upon yield we are still on the stack of the
 thread. We need to store its execution environment and longjmp back
-into our scheduler to schedule and dispatch the next thread.
+into our scheduler to schedule and dispatch another thread.
 
 ** Limitations
 - This implementation uses inline assembly and is not portable.
