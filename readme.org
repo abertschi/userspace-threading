@@ -1,6 +1,6 @@
 * User space threading library
 
-This is a micro project of a x86-64 asm, longjmp based, cooperative user space
+This is a micro project of a x86-64 asm cooperative user space
 threading library written in C.
 
 ** API
