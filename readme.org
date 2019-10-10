@@ -23,12 +23,12 @@ scheduling is implemented. Threading can be started with
 space threads returned. =thread_yield()= interrupts
 execution of a thread and runs the scheduler to dispatch the next thread. User
 land threads are supposed to cooperate and explicitly yield when they
-no longer require CPU time and are not interrupted by other
+no longer require CPU time. They are not interrupted by other
 mechanisms.
 
 ** Thread descriptor
 Upon creation, a thread is assigned a new stack region. Among other
-things, a thread descriptor keeps track of life-cycle state of a
+things, a thread descriptor keeps track of the life-cycle state of a
 thread, and when yielded stores CPU context in a jmp_buf.
 
 #+BEGIN_SRC c
@@ -46,7 +46,7 @@ struct thread {
 
 ** Dispatching a thread
 When a thread is dispatched for the first time, it's stack and base
-registers are set. When the thread ran previously, it's execution
+registers are set. When it run previously, it's execution
 context is restored with longjmp.
 
 #+BEGIN_SRC
@@ -66,14 +66,6 @@ threads execute. Upon yield we are still on the stack of the
 thread. We need to store its execution environment and longjmp back
 into our scheduler to schedule and dispatch the next thread.
 
-#+BEGIN_SRC
-void thread_yield(void):
-   if (setjmp(jmp_buf of current thread))
-       return;
-    else 
-        longjmp(jmp_buf of scheduler);
-#+END_SRC
-
 ** Limitations
 - This implementation uses inline assembly and is not portable.
 - The nature of cooperative multitasking allows threads to be
@@ -86,5 +78,6 @@ void thread_yield(void):
   execution environments.
 
 ** Resources
-- [[[[http://www.gnu.org/software/pth/rse-pmt.ps]]][Portable-Multithreading - The Signal Stack Trick For User-Space Thread Creation]]
+- Portable-Multithreading - The Signal Stack Trick For User-Space
+  Thread Creation: [[http://www.gnu.org/software/pth/rse-pmt.ps]]
 - https://stackoverflow.com/questions/20448817/how-is-preemptive-scheduling-implemented-for-user-level-threads-in-linux
