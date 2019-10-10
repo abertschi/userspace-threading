@@ -6,3 +6,9 @@
 /CMakeCache.txt
 /Makefile
 /userland-thread_list
+/main.s
+/out
+/threads.s
+/tmp/
+/userland-threads
+/userland-threads.cbp

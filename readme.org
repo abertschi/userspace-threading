@@ -1,2 +1,6 @@
 * Manage thread_list in userland
 
+
+* Reading
+- https://stackoverflow.com/questions/6768426/in-a-signal-handler-how-to-know-where-the-program-is-interrupted
+- 
