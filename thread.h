@@ -10,10 +10,10 @@
 #define STACK_SIZE 65536
 
 enum {
-    THREAD_CREATE, // 0
-    THREAD_YIELD, // 2
-    THREAD_RUN, // 3
-    THREAD_TERM // 1
+    THREAD_CREATE = 0,
+    THREAD_YIELD = 1,
+    THREAD_RUN = 2,
+    THREAD_TERM = 3
 };
 
 

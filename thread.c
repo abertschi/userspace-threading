@@ -7,13 +7,14 @@
         fprintf(stderr, "Fatal: failed to allocate memory\n"); \
         abort();}}\
 
-struct thread *current_thread = NULL;
+// store currently scheduled thread
+static struct thread *current_thread = NULL;
 
-struct thread *prev_thread = NULL;
+// store last scheduled thread
+static struct thread *prev_thread = NULL;
 
-int64_t new_thread_id = 0;
-
-jmp_buf main_env;
+static int64_t new_thread_id = 0;
+static jmp_buf main_env;
 
 struct thread *
 thread_create(void (*fun)(void *), void *arg) {
@@ -67,7 +68,8 @@ dispatch(void) {
         // stack grows from high to low
         current_thread->state = THREAD_RUN;
         __asm__ __volatile__
-        ("mov %0, %%rbp"::"r" (current_thread->sp_base + current_thread->s_size):);
+        ("mov %0, %%rbp":
+         :"r" (current_thread->sp_base + current_thread->s_size):);
         __asm__ __volatile__
         ("mov %0, %%rsp"::"r" (current_thread->sp_base + current_thread->s_size):);
 
