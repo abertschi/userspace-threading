@@ -48,7 +48,7 @@ struct thread {
 
 ** Dispatching a thread
 When a thread is dispatched for the first time, it's stack and base
-registers are set. When it run previously, it's execution
+registers are set. When it ran previously, it's execution
 context is restored with longjmp.
 
 #+BEGIN_SRC
