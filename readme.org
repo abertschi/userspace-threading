@@ -4,7 +4,7 @@ This is a micro project of a x86-64 asm cooperative user space
 threading library written in C.
 
 ** API
-User space threads are mapped N:1, i.e. M user space threads are mapped
+User space threads are mapped N:1, i.e. N user space threads are mapped
 to a single kernel space process. The implementation uses x86-64
 inline assembly and relies on setjump. It is only tested under
 GNU/Linux.
